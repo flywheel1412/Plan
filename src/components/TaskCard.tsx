@@ -4,6 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../types";
 import { fmt, isOverdue, relativeDue } from "../utils/date";
 import { avatarColor, cx, initialOf } from "../utils/ui";
+import { MarkdownView } from "./Markdown";
 
 interface TaskCardProps {
   task: Task;
@@ -40,7 +41,13 @@ export function TaskCardView({ task, onEdit, overlay = false }: TaskCardProps) {
 
       <h4 className="task-title">{task.title}</h4>
 
-      {task.description && <p className="task-desc">{task.description}</p>}
+      {task.description && (
+        <MarkdownView
+          content={task.description}
+          className="task-desc markdown-desc"
+          compact
+        />
+      )}
 
       {task.tags.length > 0 && (
         <div className="task-tags">

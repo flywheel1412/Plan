@@ -3,6 +3,7 @@ import { ListFilter, Trash2, X } from "lucide-react";
 import type { Priority, Status, Task } from "../types";
 import { COLUMNS, PRIORITY_META, PRIORITY_ORDER } from "../types";
 import { cx } from "../utils/ui";
+import { MarkdownView } from "./Markdown";
 
 interface TaskModalProps {
   open: boolean;
@@ -36,11 +37,13 @@ export function TaskModal({
   const [dueDate, setDueDate] = useState("");
   const [estimate, setEstimate] = useState("");
   const [error, setError] = useState("");
+  const [descriptionTab, setDescriptionTab] = useState<"edit" | "preview">("edit");
 
   useEffect(() => {
     if (!open) return;
     setError("");
     setTagDraft("");
+    setDescriptionTab("edit");
     if (task) {
       setTitle(task.title);
       setDescription(task.description);
@@ -155,16 +158,56 @@ export function TaskModal({
               />
             </label>
 
-            <label className="field">
-              <span className="field-label">任务描述</span>
-              <textarea
-                className="input textarea"
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="补充背景、验收标准或相关链接…"
-              />
-            </label>
+            <div className="field">
+              <div className="field-head">
+                <label className="field-label" htmlFor="task-description">
+                  任务描述
+                </label>
+                <div className="desc-tabs" role="tablist" aria-label="描述编辑模式">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={descriptionTab === "edit"}
+                    className={cx("desc-tab", descriptionTab === "edit" && "active")}
+                    onClick={() => setDescriptionTab("edit")}
+                  >
+                    编辑
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={descriptionTab === "preview"}
+                    className={cx("desc-tab", descriptionTab === "preview" && "active")}
+                    onClick={() => setDescriptionTab("preview")}
+                  >
+                    预览
+                  </button>
+                </div>
+              </div>
+              {descriptionTab === "edit" ? (
+                <>
+                  <textarea
+                    id="task-description"
+                    className="input textarea"
+                    rows={5}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="支持 Markdown：**粗体**、- 列表、`代码`、[链接](https://example.com)…"
+                  />
+                  <span className="field-hint">
+                    支持 Markdown 格式；同步到 GitLab Issue 后会按 Markdown 渲染。
+                  </span>
+                </>
+              ) : (
+                <div className="markdown-preview">
+                  {description.trim() ? (
+                    <MarkdownView content={description} />
+                  ) : (
+                    <span className="preview-empty">暂无描述内容</span>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="form-grid">
               <label className="field">
