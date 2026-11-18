@@ -60,10 +60,9 @@ npm run preview    # 预览生产构建
 
 ### 内网 Gitea 镜像
 
-- 源码镜像：http://10.22.16.201:8032/jingxu/plan-kanban
+- 源码镜像：由内网 Gitea 的 `jingxu/plan-kanban` 仓库保存（访问地址见内部文档）。
 - 说明：Gitea 1.27.3 不提供内置静态 Pages，且 raw 文件被强制以 `text/plain` + CSP sandbox 返回，无法直接承载 HTML/JS；因此网页托管以 GitHub Pages 为准，Gitea 仅保存源码镜像。
-- 更新镜像：在能同时访问 GitHub 与 Gitea 的机器上执行
-  `git clone --mirror https://github.com/flywheel1412/Plan.git && git push --mirror ssh://git@10.22.16.201:3333/jingxu/plan-kanban.git`
+- 更新镜像：在能同时访问 GitHub 与内网 Gitea 的机器上，用 `git clone --mirror` 克隆本仓库并推送到内网镜像仓库。
 
 ## 数据与备份
 
