@@ -2,6 +2,8 @@
 
 一个纯前端、开箱即用的任务排期看板。以三栏看板为核心，配合日历与甘特式时间线，帮助团队把「待办 → 进行中 → 已完成」的排期节奏看得清清楚楚。
 
+> **在线演示**：https://flywheel1412.github.io/Plan/
+
 ## 界面预览
 
 **看板视图** — 拖拽卡片跨列调整状态，逾期任务自动高亮
@@ -47,6 +49,14 @@ npm run preview    # 预览生产构建
 ```
 
 构建产物是纯静态文件，可部署到 GitHub Pages、Vercel、Netlify 或任意静态服务器（`vite.config.ts` 已设置 `base: "./"`，支持子路径托管）。
+
+## 部署
+
+仓库已配置 GitHub Actions 自动部署（`.github/workflows/deploy.yml`）：推送到 `master` 分支后自动执行 `npm ci && npm run build`，并通过 `actions/deploy-pages` 发布到 GitHub Pages。
+
+- **线上地址**：https://flywheel1412.github.io/Plan/
+- 也可在仓库 **Actions → Deploy to GitHub Pages** 中手动触发（`workflow_dispatch`）。
+- 若使用自有域名，可在 **Settings → Pages → Custom domain** 中配置。
 
 ## 数据与备份
 
