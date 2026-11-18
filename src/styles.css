@@ -2915,3 +2915,64 @@ select.input {
     max-height: 200px;
   }
 }
+
+.markdown-editor {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.markdown-editor:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: var(--surface);
+}
+
+.markdown-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-3);
+}
+
+.markdown-toolbar button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-2);
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.markdown-toolbar button:hover {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.markdown-editor .ProseMirror {
+  min-height: 168px;
+  max-height: 300px;
+  overflow: auto;
+  padding: 11px 13px;
+  outline: none;
+}
+
+.markdown-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.markdown-editor-loading {
+  min-height: 200px;
+}

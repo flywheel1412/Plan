@@ -3,7 +3,7 @@ import { ListFilter, Trash2, X } from "lucide-react";
 import type { Priority, Status, Task } from "../types";
 import { COLUMNS, PRIORITY_META, PRIORITY_ORDER } from "../types";
 import { cx } from "../utils/ui";
-import { MarkdownView } from "./Markdown";
+import { MarkdownEditor } from "./MarkdownEditor";
 
 interface TaskModalProps {
   open: boolean;
@@ -158,33 +158,12 @@ export function TaskModal({
 
             <div className="field">
               <div className="field-head">
-                <label className="field-label" htmlFor="task-description">
-                  任务描述
-                </label>
-                <span className="markdown-badge">Markdown · 实时预览</span>
+                <span className="field-label">任务描述</span>
+                <span className="markdown-badge">Markdown · 所见即所得</span>
               </div>
-              <div className="desc-grid">
-                <textarea
-                  id="task-description"
-                  className="input textarea desc-textarea"
-                  rows={7}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="支持 Markdown：**粗体**、- 列表、`代码`、[链接](https://example.com)…"
-                />
-                <div className="desc-preview">
-                  <span className="desc-preview-label">实时预览</span>
-                  <div className="markdown-preview">
-                    {description.trim() ? (
-                      <MarkdownView content={description} />
-                    ) : (
-                      <span className="preview-empty">在左侧输入 Markdown，这里会实时更新</span>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <MarkdownEditor value={description} onChange={setDescription} />
               <span className="field-hint">
-                支持 Markdown 格式；同步到 GitLab Issue 后会按 Markdown 渲染。
+                支持 Markdown 快捷输入与工具栏；内容会以 Markdown 写入 GitLab Issue。
               </span>
             </div>
 
