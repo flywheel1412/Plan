@@ -39,7 +39,7 @@ const readTheme = (): "light" | "dark" => {
   } catch {
     /* ignore */
   }
-  return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };
 
 export interface RemoteControls {
@@ -303,7 +303,7 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
         }
       />
 
-      <main className="app-main">
+      <main className="app-main" data-view={view}>
         {remote?.error && (
           <div className="sync-error" role="alert">
             <AlertTriangle size={17} />

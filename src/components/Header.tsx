@@ -77,7 +77,6 @@ export function Header({
           <div className="brand-text">
             <div className="brand-title">
               Plan
-              <span className="brand-badge">WORKSPACE</span>
             </div>
             <div className="brand-sub">
               {remote

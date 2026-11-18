@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { CalendarDays, Plus, Zap } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 import { addDays } from "date-fns";
 import { toISO } from "../utils/date";
 import "./quick-capture.css";
@@ -26,8 +26,8 @@ export function QuickCapture({ onCapture }: { onCapture: (title: string, dueDate
       input.current?.focus();
     }}>
       <label className="quick-capture__title">
-        <Zap size={16} aria-hidden="true" /><span>快速记录</span>
-        <input ref={input} value={title} aria-label="任务标题" placeholder="写下任务，回车保存…" enterKeyHint="done"
+        <Plus size={20} aria-hidden="true" />
+        <input ref={input} value={title} aria-label="任务标题" placeholder="快速记录任务…" enterKeyHint="done"
           onChange={e => { setTitle(e.target.value); setNotice(""); }}
           onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; }}
           onKeyDown={e => {
@@ -40,7 +40,7 @@ export function QuickCapture({ onCapture }: { onCapture: (title: string, dueDate
           <option value="none">不设截止</option><option value="today">今天截止</option><option value="tomorrow">明天截止</option>
         </select>
       </label>
-      <button className="quick-capture__submit" type="submit" disabled={!title.trim()}><Plus size={15} aria-hidden="true" />记录</button>
+      <button className="quick-capture__submit" type="submit" disabled={!title.trim()}>记录</button>
       <span className="quick-capture__notice" role="status">{notice}</span>
     </form>
   );

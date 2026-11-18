@@ -1,15 +1,15 @@
-import { getISOWeek } from 'date-fns';
+import { fmt } from '../utils/date';
+import { useLocalDay } from '../hooks/useLocalDay';
 import type { ViewKey } from '../types';
 
-const headings = {
-  today: ['DAILY PLAN', '今日工作台'], board: ['KANBAN', '任务看板'], calendar: ['CALENDAR', '排期日历'], timeline: ['TIMELINE', '项目时间线'],
-} as const;
+const headings: Record<ViewKey, string> = {
+  today: '今天', board: '任务看板', calendar: '排期日历', timeline: '项目时间线',
+};
 
 export function WorkspaceHeading({ view }: { view: ViewKey }) {
-  const today = new Date();
-  const [code, title] = headings[view];
-  return <section className="workspace-heading" aria-label="当前工作视图">
-    <div><div className="workspace-code"><i />WORKSPACE <b>/</b> {code}</div><h1>{title}</h1></div>
-    <div className="workspace-clock"><span>WEEK {String(getISOWeek(today)).padStart(2, '0')}</span><time dateTime={[today.getFullYear(), String(today.getMonth()+1).padStart(2,'0'), String(today.getDate()).padStart(2,'0')].join('-')}>{today.toLocaleDateString('zh-CN', {month:'long', day:'numeric', weekday:'long'})}</time></div>
-  </section>;
+  const day = useLocalDay();
+  return <header className="workspace-heading planner-heading">
+    <time dateTime={day}>{fmt(day, 'M月d日 EEEE')}</time>
+    <h1>{headings[view]}</h1>
+  </header>;
 }

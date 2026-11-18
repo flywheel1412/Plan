@@ -1,0 +1,37 @@
+/* Neutral grouped surfaces and native system type for the personal planner. */
+:root {
+  --bg: #f5f5f7; --surface: #fff; --surface-2: #f7f7f8; --surface-3: #eaeaec;
+  --text: #1d1d1f; --text-2: #4c4c52; --text-3: #66666d;
+  --border: #dedee2; --border-soft: #ededf0; --border-strong: #b7b7be;
+  --accent: #0069ca; --accent-2: #0073da; --ink-blue: #0069ca; --accent-soft: #eaf3ff;
+  --header-bg: rgba(249,249,251,.87); --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  --shadow-sm: 0 1px 4px rgb(0 0 0 / 5%); --selection-shadow: 0 1px 4px rgb(0 0 0 / 14%);
+}
+[data-theme="dark"] {
+  --bg: #121214; --surface: #202022; --surface-2: #262628; --surface-3: #313134;
+  --text:#f5f5f7; --text-2:#ceced3; --text-3:#aaaab1;
+  --border:#39393d; --border-soft:#303034; --border-strong:#63636b;
+  --accent:#77baff; --accent-2:#82beff; --ink-blue:#0069ca; --accent-soft:#1e354c;
+  --header-bg:rgba(29,29,31,.87); --selection-shadow:0 1px 4px rgb(0 0 0 / 35%);
+}
+.app-header { background: var(--header-bg); backdrop-filter: saturate(150%) blur(18px); -webkit-backdrop-filter: saturate(150%) blur(18px); }
+@media(prefers-reduced-transparency: reduce) { .app-header {background: var(--surface); backdrop-filter:none; -webkit-backdrop-filter:none;} }
+.header-inner { max-width:1440px; }
+.brand {gap:10px;}
+.brand-mark {border-radius:10px;background:linear-gradient(160deg,#519dfa,#0070cf);}
+.brand-sub {font-size:11px;}
+.app-header .view-switch {padding:3px; border:0; border-radius:11px; background:var(--surface-3); gap:2px;}
+.app-header .view-tab {border-radius:8px; font-size:13px; color:var(--text-2);}
+.app-header .view-tab.active {color:var(--text);background:var(--surface);box-shadow:var(--selection-shadow);}
+.header-actions .btn-primary {border-radius:999px; padding-inline:16px;}
+@media(min-width:1001px) { .header-inner {display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:16px;} }
+.app-main {max-width:1440px;}
+.app-main[data-view="today"] {max-width:990px;}
+.planner-heading {display:block; padding:12px 0 4px;}
+.planner-heading time {font-size:14px;color:var(--text-3);font-weight:550;}
+.planner-heading h1 {font-size:clamp(30px,3.5vw,44px);letter-spacing:-.05em;font-weight:720;line-height:1.2;margin:4px 0 0;}
+.app-main[data-view="today"] .planner-heading h1 {color:var(--accent);}
+.polished-board .board-column {border-radius:16px;}
+.polished-board, .polished-task, [data-theme="dark"] :is(.polished-board,.polished-task) {--board-blue:var(--accent);--board-line:var(--border);--board-lane:var(--surface-3);--board-ink-muted:var(--text-3);--board-card:var(--surface);--board-chip:var(--surface-2);}
+.sf-metrics,.sf-filters,[data-theme="dark"] :is(.sf-metrics,.sf-filters) {--sf-blue:var(--accent);--sf-track:var(--surface-3);--sf-selection:var(--accent-soft);--sf-muted:var(--text-3);}
+@media(max-width:760px){ .app-header .view-tab {min-height:38px;} .planner-heading {padding:8px 2px 2px;} .app-main[data-view="today"] {padding-inline:16px;} }

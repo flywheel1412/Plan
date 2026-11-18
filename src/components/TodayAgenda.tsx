@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { AlarmClock, CalendarDays, Check, CheckCheck, ChevronDown, Clock3, Inbox, ListTodo, MoveRight } from "lucide-react";
+import { useId, useMemo, useState } from "react";
+import { useLocalDay } from "../hooks/useLocalDay";
+import { Check, CheckCheck, ChevronDown } from "lucide-react";
 import { PRIORITY_ORDER, type Task } from "../types";
 import { addDays } from "date-fns";
-import { fmtLong, fromISO, toISO, todayISO } from "../utils/date";
+import { fmt, fromISO, toISO } from "../utils/date";
 import "./today-agenda.css";
 
 interface TodayAgendaProps {
@@ -14,10 +15,10 @@ interface TodayAgendaProps {
 }
 
 const sections = [
-  { key: "overdue", title: "逾期", icon: AlarmClock },
-  { key: "today", title: "今日安排", icon: CalendarDays },
-  { key: "unscheduled", title: "未排期", icon: Inbox },
-  { key: "next", title: "接下来", icon: MoveRight },
+  { key: "overdue", title: "逾期" },
+  { key: "today", title: "今日安排" },
+  { key: "unscheduled", title: "未排期" },
+  { key: "next", title: "接下来" },
 ] as const;
 type Group = (typeof sections)[number]["key"];
 
@@ -27,29 +28,23 @@ function groupFor({ startDate: start, dueDate: end }: Task, today: string): Grou
   return start || end ? "next" : "unscheduled";
 }
 
-function scheduleLabel({ startDate: start, dueDate: end }: Task) {
-  if (start && end) return start === end ? `${start} 当日` : `${start} 至 ${end}`;
-  if (start) return `${start} 开始`;
-  if (end) return `${end} 截止`;
-  return "未设日期";
-}
-
-// Refresh locally at midnight; a backgrounded tab also checks when it regains focus.
-function useLocalDay() {
-  const [today, setToday] = useState(todayISO);
-  useEffect(() => {
-    const refresh = () => setToday(todayISO());
-    const midnight = new Date();
-    midnight.setHours(24, 0, 0, 0);
-    refresh();
-    const timer = window.setTimeout(refresh, midnight.getTime() - Date.now() + 10);
-    window.addEventListener("focus", refresh);
-    return () => { window.clearTimeout(timer); window.removeEventListener("focus", refresh); };
-  }, [today]);
-  return today;
+function scheduleLabel({ startDate: start, dueDate: end }: Task, today: string) {
+  // Older JSON imports may contain non-ISO dates. Keep the row editable.
+  if ([start, end].some(value => value && !Number.isFinite(fromISO(value).getTime()))) return "日期待检查";
+  const short = (iso: string) => iso === today ? "今天" : fmt(iso, iso.slice(0, 4) === today.slice(0, 4) ? "M月d日" : "yyyy年M月d日");
+  if (start && end) {
+    if (start === end) return short(start);
+    const sameMonth = start.slice(0, 7) === end.slice(0, 7);
+    const last = sameMonth && start !== today && end !== today ? fmt(end, "d日") : short(end);
+    return `${short(start)} 至 ${last}`;
+  }
+  if (start) return `${short(start)}开始`;
+  if (end) return `${short(end)}截止`;
+  return null;
 }
 
 export function TodayAgenda({ tasks, onEdit, onComplete, onSchedule }: TodayAgendaProps) {
+  const id = useId();
   const today = useLocalDay();
   const [expanded, setExpanded] = useState<Partial<Record<Group, boolean>>>({});
   const groups = useMemo(() => {
@@ -68,30 +63,28 @@ export function TodayAgenda({ tasks, onEdit, onComplete, onSchedule }: TodayAgen
 
   return (
     <section className="today-agenda" aria-label="任务日程">
-      <header className="ta-heading">
-        <div><ListTodo size={20} aria-hidden="true" /><h2>任务日程</h2></div>
-        <time dateTime={today}>{fmtLong(today)}</time>
-      </header>
       {!first ? (
         <div className="ta-empty"><CheckCheck aria-hidden="true" size={26} /><p>当前没有未完成任务</p></div>
-      ) : sections.map(({ key, title, icon: Icon }) => {
+      ) : sections.map(({ key, title }) => {
         const list = groups[key];
         const open = expanded[key] ?? (key === "today" || key === "overdue" || key === first);
         if (!list.length && key !== "today") return null;
         return (
           <div className={`ta-group ta-${key}`} key={key}>
-            <h3><button className="ta-toggle" type="button" aria-expanded={open}
+            <h2><button className="ta-toggle" type="button" aria-expanded={open}
               onClick={() => setExpanded(previous => ({ ...previous, [key]: !open }))}>
-              <Icon size={16} aria-hidden="true" />{title}<span className="ta-count">{list.length}</span>
+              {title}<span className="ta-count">{list.length}</span>
               <ChevronDown className="ta-chevron" size={15} aria-hidden="true" />
-            </button></h3>
+            </button></h2>
             {open && (list.length ? <ul>{list.map(task => (
               <li key={task.id}>
-                <button className="ta-edit" type="button" onClick={() => onEdit(task)} aria-label={`编辑：${task.title}`}>
-                  <span className="ta-titleline"><span className="ta-priority" data-priority={task.priority}>{task.priority}</span>
-                    <strong>{task.title}</strong></span>
-                  <span className="ta-meta"><span><CalendarDays size={13} aria-hidden="true" />{scheduleLabel(task)}</span>
-                    {task.estimate != null && <span><Clock3 size={13} aria-hidden="true" />预计 {task.estimate}h</span>}</span>
+                <button className="ta-complete" type="button" onClick={() => onComplete(task)}
+                  aria-label={`标记完成：${task.title}`} title="标记完成"><span aria-hidden="true"><Check size={14} /></span></button>
+                <button className="ta-edit" type="button" onClick={() => onEdit(task)} aria-label={`编辑：${task.title}`} aria-describedby={`${id}-${encodeURIComponent(task.id)}`}>
+                  <strong>{task.title}</strong>
+                  <span className="ta-meta" id={`${id}-${encodeURIComponent(task.id)}`}><span className="ta-priority" data-priority={task.priority}>{task.priority}</span>
+                    {(task.startDate || task.dueDate) && <span>{scheduleLabel(task, today)}</span>}
+                    {task.estimate != null && <span>预计 {task.estimate}h</span>}</span>
                 </button>
                 {onSchedule && (key === "unscheduled" || key === "overdue") && (
                   <button className="ta-schedule" type="button"
@@ -101,8 +94,6 @@ export function TodayAgenda({ tasks, onEdit, onComplete, onSchedule }: TodayAgen
                     {key === "overdue" ? "截止延至明天" : "今天截止"}
                   </button>
                 )}
-                <button className="ta-complete" type="button" onClick={() => onComplete(task)}
-                  aria-label={`标记完成：${task.title}`} title="标记完成"><Check size={16} aria-hidden="true" /></button>
               </li>
             ))}</ul> : <p className="ta-none">没有排在今天的任务</p>)}
           </div>
