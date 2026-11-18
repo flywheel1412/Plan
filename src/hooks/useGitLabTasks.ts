@@ -69,6 +69,12 @@ function sortTasks(tasks: Task[]): Task[] {
   });
 }
 
+async function closeDoneIssue(api: GitLabApi, task: Task): Promise<Task> {
+  if (task.status !== "done" || task.issueState === "closed" || !task.iid) return task;
+  const updated = await api.updateIssue(task.iid, { state_event: "close" });
+  return { ...task, issueState: updated.state };
+}
+
 export function useGitLabTasks(config: GitLabConfig): GitLabStore {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
@@ -284,7 +290,7 @@ export function useGitLabTasks(config: GitLabConfig): GitLabStore {
           const created = await api.createIssue(
             taskToIssuePayload(optimistic, membersRef.current, undefined, true),
           );
-          const mapped = issueToTask(created);
+          const mapped = await closeDoneIssue(api, issueToTask(created));
           lastSyncedRef.current.set(mapped.iid as number, taskSignature(mapped));
           if (deletedTempRef.current.has(optimistic.id)) {
             deletedTempRef.current.delete(optimistic.id);
@@ -403,7 +409,7 @@ export function useGitLabTasks(config: GitLabConfig): GitLabStore {
           const created = await api.createIssue(
             taskToIssuePayload(task, membersRef.current, undefined, true),
           );
-          const mapped = issueToTask(created);
+          const mapped = await closeDoneIssue(api, issueToTask(created));
           lastSyncedRef.current.set(mapped.iid as number, taskSignature(mapped));
           setTasks((previous) => [...previous, mapped]);
           imported += 1;

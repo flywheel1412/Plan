@@ -71,11 +71,39 @@ npm run preview    # 预览生产构建
 - 更新站点：重新构建并同步 `site/` 后推送 `master`，GitLab 流水线会自动重新发布。
 - Pages 的访问控制、唯一域名与 HTTPS 策略由 GitLab 管理员配置。
 
-## 数据与备份
+## 数据存储
 
-- 数据保存在浏览器 `localStorage` 的 `plan-kanban.tasks.v1` 键中，刷新不丢失。
-- 顶部「⋯」菜单可**导出 JSON**、**导入 JSON**、**恢复示例数据**。
-- 首次打开会载入 12 条中文示例任务，可随时恢复。
+应用支持两种运行模式，由部署目录中是否存在 `config.json` 自动判断：
+
+### 本地模式
+
+- 适用于 GitHub Pages 等纯静态托管（没有 `config.json`）。
+- 数据保存在浏览器 `localStorage` 的 `plan-kanban.tasks.v1` 键中，按浏览器/域名隔离。
+- 顶部「⋯」菜单可导出 / 导入 JSON，或恢复示例数据。
+
+### GitLab 协作模式
+
+- 适用于内网 GitLab Pages（部署时生成 `config.json`）。
+- 通过 GitLab OAuth 2.0（PKCE 公共客户端）登录，任务保存为项目中的 **GitLab Issues**。
+- 字段映射：
+  - 状态：`status::todo` / `status::doing` / `status::done`；标记为完成时会关闭 Issue。
+  - 优先级：`priority::P0` … `priority::P3`。
+  - 标签：`tag::<名称>`。
+  - 截止日期：Issue 的 `due_date`。
+  - 开始日期、预估工时、列内排序、原始负责人姓名：写在 Issue 描述中的隐藏元数据里。
+  - 负责人：优先匹配 GitLab 项目成员；未匹配时保留姓名展示，不强制分配。
+- `config.json` 由 GitLab CI 根据以下项目变量生成，不提交到仓库：
+  - `PLAN_GITLAB_BASE_URL`
+  - `PLAN_GITLAB_PROJECT_ID`
+  - `PLAN_GITLAB_CLIENT_ID`
+  - `PLAN_GITLAB_REDIRECT_URI`
+- OAuth 应用需使用公共客户端（不勾选「私密」），回调地址为站点根地址，scope 为 `api`。
+- 首次连接空项目时，可一键导入本机任务或创建示例任务；之后所有增删改与拖拽都会写回 GitLab Issues。
+
+## 备份
+
+- 顶部「⋯」菜单可**导出 JSON 备份**，两种模式都可用。
+- 本地模式可导入 JSON、恢复示例数据；GitLab 模式的任务本身保存在 Issues 中，空项目可导入本机任务或创建示例任务。
 - 导入时仅校验标题与状态，未知字段会被安全忽略。
 
 任务数据结构：
