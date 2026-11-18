@@ -15,6 +15,9 @@ export interface Task {
   order: number;
   createdAt: string;
   updatedAt: string;
+  /** GitLab issue IID when the task is backed by GitLab. */
+  iid?: number;
+  issueState?: "opened" | "closed";
 }
 
 export interface ColumnMeta {

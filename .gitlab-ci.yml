@@ -1,7 +1,15 @@
 pages:
   stage: deploy
   script:
-    - echo "Publishing prebuilt static site from site/"
+    - test -n "$PLAN_GITLAB_BASE_URL"
+    - test -n "$PLAN_GITLAB_PROJECT_ID"
+    - test -n "$PLAN_GITLAB_CLIENT_ID"
+    - test -n "$PLAN_GITLAB_REDIRECT_URI"
+    - |
+      cat > site/config.json <<JSON
+      {"mode":"gitlab","gitlabBaseUrl":"${PLAN_GITLAB_BASE_URL}","projectId":${PLAN_GITLAB_PROJECT_ID},"oauthClientId":"${PLAN_GITLAB_CLIENT_ID}","redirectUri":"${PLAN_GITLAB_REDIRECT_URI}"}
+      JSON
+    - cat site/config.json
   pages:
     publish: site
   rules:

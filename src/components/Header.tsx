@@ -2,18 +2,28 @@ import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   Check,
+  Cloud,
   Columns3,
   Download,
   GanttChartSquare,
+  LogOut,
   Moon,
   MoreHorizontal,
   Plus,
+  RefreshCw,
   RotateCcw,
   Sun,
   Upload,
 } from "lucide-react";
 import type { ViewKey } from "../types";
 import { VIEW_LABEL } from "../types";
+
+export interface RemoteHeaderInfo {
+  user: { name: string; username: string };
+  syncing: boolean;
+  onRefresh: () => void;
+  onLogout: () => void;
+}
 
 interface HeaderProps {
   view: ViewKey;
@@ -22,9 +32,10 @@ interface HeaderProps {
   onToggleTheme: () => void;
   onNewTask: () => void;
   onExport: () => void;
-  onImport: () => void;
-  onReset: () => void;
+  onImport?: () => void;
+  onReset?: () => void;
   taskCount: number;
+  remote?: RemoteHeaderInfo;
 }
 
 const VIEW_ICONS = {
@@ -43,6 +54,7 @@ export function Header({
   onImport,
   onReset,
   taskCount,
+  remote,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -66,7 +78,13 @@ export function Header({
               Plan
               <span className="brand-badge">排期看板</span>
             </div>
-            <div className="brand-sub">共 {taskCount} 个任务 · 数据保存在本机</div>
+            <div className="brand-sub">
+              {remote
+                ? remote.syncing
+                  ? "正在同步 GitLab…"
+                  : `已连接 GitLab · ${remote.user.name || remote.user.username}`
+                : `共 ${taskCount} 个任务 · 数据保存在本机`}
+            </div>
           </div>
         </div>
 
@@ -88,6 +106,17 @@ export function Header({
         </nav>
 
         <div className="header-actions">
+          {remote && (
+            <div
+              className="remote-chip"
+              title={`已连接 GitLab：${remote.user.username}`}
+            >
+              <span className={remote.syncing ? "sync-dot syncing" : "sync-dot"} />
+              <Cloud size={13} />
+              <span>{remote.user.name || remote.user.username}</span>
+            </div>
+          )}
+
           <button
             type="button"
             className="icon-btn"
@@ -110,6 +139,20 @@ export function Header({
             </button>
             {menuOpen && (
               <div className="menu" role="menu">
+                {remote && (
+                  <button
+                    type="button"
+                    className="menu-item"
+                    disabled={remote.syncing}
+                    onClick={() => {
+                      remote.onRefresh();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <RefreshCw size={16} className={remote.syncing ? "spin" : undefined} />
+                    {remote.syncing ? "正在同步…" : "刷新 GitLab 数据"}
+                  </button>
+                )}
                 <button
                   type="button"
                   className="menu-item"
@@ -121,29 +164,47 @@ export function Header({
                   <Download size={16} />
                   导出 JSON 备份
                 </button>
-                <button
-                  type="button"
-                  className="menu-item"
-                  onClick={() => {
-                    onImport();
-                    setMenuOpen(false);
-                  }}
-                >
-                  <Upload size={16} />
-                  导入 JSON 数据
-                </button>
+                {!remote && onImport && (
+                  <button
+                    type="button"
+                    className="menu-item"
+                    onClick={() => {
+                      onImport();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <Upload size={16} />
+                    导入 JSON 数据
+                  </button>
+                )}
                 <div className="menu-sep" />
-                <button
-                  type="button"
-                  className="menu-item danger"
-                  onClick={() => {
-                    onReset();
-                    setMenuOpen(false);
-                  }}
-                >
-                  <RotateCcw size={16} />
-                  恢复示例数据
-                </button>
+                {remote ? (
+                  <button
+                    type="button"
+                    className="menu-item danger"
+                    onClick={() => {
+                      remote.onLogout();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <LogOut size={16} />
+                    退出 GitLab 登录
+                  </button>
+                ) : (
+                  onReset && (
+                    <button
+                      type="button"
+                      className="menu-item danger"
+                      onClick={() => {
+                        onReset();
+                        setMenuOpen(false);
+                      }}
+                    >
+                      <RotateCcw size={16} />
+                      恢复示例数据
+                    </button>
+                  )
+                )}
               </div>
             )}
           </div>
