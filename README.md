@@ -64,6 +64,13 @@ npm run preview    # 预览生产构建
 - 说明：Gitea 1.27.3 不提供内置静态 Pages，且 raw 文件被强制以 `text/plain` + CSP sandbox 返回，无法直接承载 HTML/JS；因此网页托管以 GitHub Pages 为准，Gitea 仅保存源码镜像。
 - 更新镜像：在能同时访问 GitHub 与内网 Gitea 的机器上，用 `git clone --mirror` 克隆本仓库并推送到内网镜像仓库。
 
+### 内网 GitLab Pages
+
+- 项目：内网 GitLab 的 `project/plan-kanban`；站点地址见内部文档。
+- 构建产物已提交到 `site/`（由 `npm run build` 的 `dist/` 同步而来），`.gitlab-ci.yml` 直接发布该目录，适配没有 Node/npm 的 shell runner。
+- 更新站点：重新构建并同步 `site/` 后推送 `master`，GitLab 流水线会自动重新发布。
+- Pages 的访问控制、唯一域名与 HTTPS 策略由 GitLab 管理员配置。
+
 ## 数据与备份
 
 - 数据保存在浏览器 `localStorage` 的 `plan-kanban.tasks.v1` 键中，刷新不丢失。
