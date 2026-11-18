@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
+import { Extension, InputRule } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -32,6 +33,25 @@ function markdownOf(editor: Editor): string {
   return storage.markdown?.getMarkdown() ?? "";
 }
 
+/** Converts typed "[ ] " / "[x] " (optionally after "- ") into a task list item. */
+const TaskListShortcut = Extension.create({
+  name: "taskListShortcut",
+  addInputRules() {
+    return [
+      new InputRule({
+        find: /^\s*\[([ xX])\]\s$/,
+        handler: ({ range, match, chain }) => {
+          const checked = match[1].toLowerCase() === "x";
+          chain().deleteRange(range).toggleTaskList().run();
+          if (checked) {
+            chain().updateAttributes("taskItem", { checked: true }).run();
+          }
+        },
+      }),
+    ];
+  },
+});
+
 export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   const lastEmitted = useRef(value);
 
@@ -40,6 +60,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
       StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
       TaskList,
       TaskItem.configure({ nested: true }),
+      TaskListShortcut,
       Link.configure({
         openOnClick: false,
         autolink: true,
