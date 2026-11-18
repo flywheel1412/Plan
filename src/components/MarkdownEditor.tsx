@@ -3,6 +3,8 @@ import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
 import { Markdown } from "tiptap-markdown";
 import {
   Bold,
@@ -11,6 +13,7 @@ import {
   Italic,
   Link2,
   List,
+  ListChecks,
   ListOrdered,
   Quote,
   Redo2,
@@ -35,6 +38,8 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -104,6 +109,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
     { label: "二级标题", icon: <Heading2 size={15} />, action: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
     { label: "无序列表", icon: <List size={15} />, action: () => editor.chain().focus().toggleBulletList().run() },
     { label: "有序列表", icon: <ListOrdered size={15} />, action: () => editor.chain().focus().toggleOrderedList().run() },
+    { label: "任务列表", icon: <ListChecks size={15} />, action: () => editor.chain().focus().toggleTaskList().run() },
     { label: "引用", icon: <Quote size={15} />, action: () => editor.chain().focus().toggleBlockquote().run() },
     { label: "代码块", icon: <Code2 size={15} />, action: () => editor.chain().focus().toggleCodeBlock().run() },
     { label: "链接", icon: <Link2 size={15} />, action: setLink },
