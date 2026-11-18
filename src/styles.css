@@ -3056,6 +3056,20 @@ select.input {
   margin-top: 0.28em;
 }
 
+/* Personal workspace: keep the four destinations readable on phones. */
+.agenda-scope { display:flex; align-self:flex-start; padding:3px; border:1px solid var(--border); background:var(--surface); border-radius:8px; }
+.agenda-scope button { padding:6px 12px; border:0; background:transparent; border-radius:5px; font-size:13px; color:var(--text-2); }
+.agenda-scope button[aria-pressed="true"] { color:var(--accent); background:var(--accent-soft); }
+.toast { display:flex; gap:12px; align-items:center; max-width:calc(100vw - 24px); }
+.toast span { overflow:hidden; text-overflow:ellipsis; }
+.toast button { border:1px solid currentColor; border-radius:6px; background:transparent; padding:3px 8px; flex:none; }
+@media(max-width:760px){
+  .app-header .header-inner {display:grid; grid-template-columns:1fr auto; gap:6px;}
+  .app-header .brand-text {display:block;} .app-header .brand-sub {display:none;}
+  .app-header .view-switch {grid-column:1/-1; grid-row:2; padding:0; border:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr));}
+  .app-header .view-tab {justify-content:center;min-height:36px;} .app-header .view-tab span {display:inline;}
+  .app-header .header-actions {grid-column:2;grid-row:1;} .app-header .remote-chip {display:none;}
+}
 /* Workspace chrome: graphite surfaces, cobalt controls, drafting-grid detail. */
 :root { --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; --ink-blue:#2458d6; }
 .app-header { background:var(--surface); backdrop-filter:none; }

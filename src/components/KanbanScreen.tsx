@@ -7,6 +7,9 @@ import {
   Loader2,
   X,
 } from "lucide-react";
+import { TodayAgenda } from "./TodayAgenda";
+import { QuickCapture } from "./QuickCapture";
+import { VIEW_LABEL } from "../types";
 import { WorkspaceHeading } from "./WorkspaceHeading";
 import { Board } from "./Board";
 import { CalendarView } from "./CalendarView";
@@ -57,7 +60,20 @@ interface KanbanScreenProps {
 }
 
 export function KanbanScreen({ store, remote }: KanbanScreenProps) {
-  const [view, setView] = useState<ViewKey>("board");
+  const [view, setView] = useState<ViewKey>(() => {
+    try {
+      const saved = localStorage.getItem("plan-kanban.view");
+      if (saved && Object.prototype.hasOwnProperty.call(VIEW_LABEL, saved)) return saved as ViewKey;
+    } catch { /* storage is optional */ }
+    return "today";
+  });
+  useEffect(() => {
+    try { localStorage.setItem("plan-kanban.view", view); } catch { /* optional */ }
+  }, [view]);
+  const [mineOnly, setMineOnly] = useState(true);
+  const agendaTasks = remote && mineOnly ? store.tasks.filter(task =>
+    !!task.assignee && [remote.user.name, remote.user.username].some(name =>
+      name && name.trim().toLowerCase() === task.assignee.trim().toLowerCase())) : store.tasks;
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [theme, setTheme] = useState<"light" | "dark">(readTheme);
   const [modalOpen, setModalOpen] = useState(false);
@@ -66,6 +82,7 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
     status?: Status;
     dueDate?: string;
   } | null>(null);
+  const [undoTask, setUndoTask] = useState<Task | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const toastTimer = useRef<number | undefined>(undefined);
@@ -80,10 +97,11 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
     }
   }, [theme]);
 
-  const showToast = useCallback((text: string) => {
+  const showToast = useCallback((text: string, undo: Task | null = null) => {
+    setUndoTask(undo);
     setToast(text);
     window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 2600);
+    toastTimer.current = window.setTimeout(() => { setToast(null); setUndoTask(null); }, undo ? 8000 : 2600);
   }, []);
 
   useEffect(() => () => window.clearTimeout(toastTimer.current), []);
@@ -297,6 +315,15 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
         )}
 
         <WorkspaceHeading view={view} />
+        {view === "today" ? <>
+          {remote && <div className="agenda-scope" role="group" aria-label="议程范围">
+            <button type="button" aria-pressed={mineOnly} onClick={() => setMineOnly(true)}>我负责的</button>
+            <button type="button" aria-pressed={!mineOnly} onClick={() => setMineOnly(false)}>全部任务</button>
+          </div>}
+          <QuickCapture onCapture={(title, dueDate) => {
+            store.createTask({ title, dueDate, assignee: remote?.user.name || remote?.user.username || "" });
+          }} />
+        </> : <>
         <StatsBar tasks={store.tasks} />
 
         <FilterBar
@@ -307,6 +334,7 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
           resultCount={visibleTasks.length}
           totalCount={store.tasks.length}
         />
+        </>}
 
         {showBackendEmpty && remote && (
           <section className="backend-banner">
@@ -339,7 +367,15 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
           </section>
         )}
 
-        {visibleTasks.length === 0 && store.tasks.length > 0 ? (
+        {view === "today" ? (
+          <TodayAgenda tasks={agendaTasks} onEdit={openEditTask} onSchedule={(task, dueDate) => {
+            store.updateTask(task.id, { dueDate });
+            showToast(`截止日已更新为 ${dueDate}`);
+          }} onComplete={task => {
+            store.moveTask(task.id, "done");
+            showToast(`已完成：${task.title}`, task);
+          }} />
+        ) : visibleTasks.length === 0 && store.tasks.length > 0 ? (
           <div className="empty-state filter-empty">
             <AlertCircle size={30} />
             <p>没有符合当前筛选条件的任务</p>
@@ -412,7 +448,11 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
 
       {toast && (
         <div className="toast" role="status">
-          {toast}
+          <span>{toast}</span>
+          {undoTask && <button type="button" onClick={() => {
+            store.moveTask(undoTask.id, undoTask.status, undoTask.order);
+            showToast("已撤销完成");
+          }}>撤销</button>}
         </div>
       )}
     </div>

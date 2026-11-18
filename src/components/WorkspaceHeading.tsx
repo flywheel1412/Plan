@@ -2,7 +2,7 @@ import { getISOWeek } from 'date-fns';
 import type { ViewKey } from '../types';
 
 const headings = {
-  board: ['KANBAN', '任务看板'], calendar: ['CALENDAR', '排期日历'], timeline: ['TIMELINE', '项目时间线'],
+  today: ['DAILY PLAN', '今日工作台'], board: ['KANBAN', '任务看板'], calendar: ['CALENDAR', '排期日历'], timeline: ['TIMELINE', '项目时间线'],
 } as const;
 
 export function WorkspaceHeading({ view }: { view: ViewKey }) {

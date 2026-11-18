@@ -52,6 +52,7 @@ export const STATUS_LABEL: Record<Status, string> = {
 };
 
 export const VIEW_LABEL = {
+  today: "今日",
   board: "看板",
   calendar: "日历",
   timeline: "时间线",

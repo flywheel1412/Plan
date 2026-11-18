@@ -39,6 +39,7 @@ interface HeaderProps {
 }
 
 const VIEW_ICONS = {
+  today: Sun,
   board: Columns3,
   calendar: CalendarDays,
   timeline: GanttChartSquare,
