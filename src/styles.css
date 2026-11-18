@@ -2860,3 +2860,58 @@ select.input {
 .task-desc.markdown-desc p {
   margin: 0;
 }
+
+.markdown-badge {
+  font-size: 10px;
+  font-weight: 650;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.desc-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.desc-textarea {
+  min-height: 168px;
+  height: 100%;
+  resize: vertical;
+}
+
+.desc-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.desc-preview-label {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.desc-preview .markdown-preview {
+  flex: 1;
+  min-height: 168px;
+  max-height: 260px;
+}
+
+@media (max-width: 760px) {
+  .desc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .desc-preview .markdown-preview {
+    min-height: 120px;
+    max-height: 200px;
+  }
+}

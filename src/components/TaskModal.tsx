@@ -37,13 +37,11 @@ export function TaskModal({
   const [dueDate, setDueDate] = useState("");
   const [estimate, setEstimate] = useState("");
   const [error, setError] = useState("");
-  const [descriptionTab, setDescriptionTab] = useState<"edit" | "preview">("edit");
 
   useEffect(() => {
     if (!open) return;
     setError("");
     setTagDraft("");
-    setDescriptionTab("edit");
     if (task) {
       setTitle(task.title);
       setDescription(task.description);
@@ -163,50 +161,31 @@ export function TaskModal({
                 <label className="field-label" htmlFor="task-description">
                   任务描述
                 </label>
-                <div className="desc-tabs" role="tablist" aria-label="描述编辑模式">
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={descriptionTab === "edit"}
-                    className={cx("desc-tab", descriptionTab === "edit" && "active")}
-                    onClick={() => setDescriptionTab("edit")}
-                  >
-                    编辑
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={descriptionTab === "preview"}
-                    className={cx("desc-tab", descriptionTab === "preview" && "active")}
-                    onClick={() => setDescriptionTab("preview")}
-                  >
-                    预览
-                  </button>
+                <span className="markdown-badge">Markdown · 实时预览</span>
+              </div>
+              <div className="desc-grid">
+                <textarea
+                  id="task-description"
+                  className="input textarea desc-textarea"
+                  rows={7}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="支持 Markdown：**粗体**、- 列表、`代码`、[链接](https://example.com)…"
+                />
+                <div className="desc-preview">
+                  <span className="desc-preview-label">实时预览</span>
+                  <div className="markdown-preview">
+                    {description.trim() ? (
+                      <MarkdownView content={description} />
+                    ) : (
+                      <span className="preview-empty">在左侧输入 Markdown，这里会实时更新</span>
+                    )}
+                  </div>
                 </div>
               </div>
-              {descriptionTab === "edit" ? (
-                <>
-                  <textarea
-                    id="task-description"
-                    className="input textarea"
-                    rows={5}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="支持 Markdown：**粗体**、- 列表、`代码`、[链接](https://example.com)…"
-                  />
-                  <span className="field-hint">
-                    支持 Markdown 格式；同步到 GitLab Issue 后会按 Markdown 渲染。
-                  </span>
-                </>
-              ) : (
-                <div className="markdown-preview">
-                  {description.trim() ? (
-                    <MarkdownView content={description} />
-                  ) : (
-                    <span className="preview-empty">暂无描述内容</span>
-                  )}
-                </div>
-              )}
+              <span className="field-hint">
+                支持 Markdown 格式；同步到 GitLab Issue 后会按 Markdown 渲染。
+              </span>
             </div>
 
             <div className="form-grid">
