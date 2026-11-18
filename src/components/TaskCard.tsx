@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, GripVertical } from "lucide-react";
+import { CalendarDays, Clock, Flag, GripVertical } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../types";
@@ -20,7 +20,7 @@ export function TaskCardView({ task, onEdit, overlay = false }: TaskCardProps) {
   return (
     <article
       className={cx(
-        "task-card",
+        "task-card polished-task",
         done && "is-done",
         overdue && "is-overdue",
         overlay && "is-overlay",
@@ -29,8 +29,9 @@ export function TaskCardView({ task, onEdit, overlay = false }: TaskCardProps) {
     >
       <div className="task-top">
         <span className={cx("priority-pill", `priority-${task.priority}`)}>
-          {task.priority}
+          <Flag size={10} aria-hidden="true" /> {task.priority}
         </span>
+        {task.iid != null && <span className="task-iid">#{task.iid}</span>}
         {due.tone !== "none" && (
           <span className={cx("due-pill", due.tone)}>{due.text}</span>
         )}

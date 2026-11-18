@@ -1,77 +1,49 @@
-import { AlertTriangle, CheckCircle2, ListTodo, Zap } from "lucide-react";
+import { CircleAlert, CircleDot, Layers3, PieChart } from "lucide-react";
 import type { Task } from "../types";
 import { isOverdue } from "../utils/date";
+import "./stats-filters.css";
 
-interface StatsBarProps {
-  tasks: Task[];
-}
-
-export function StatsBar({ tasks }: StatsBarProps) {
+export function StatsBar({ tasks }: { tasks: Task[] }) {
   const total = tasks.length;
-  const done = tasks.filter((t) => t.status === "done").length;
-  const doing = tasks.filter((t) => t.status === "doing").length;
-  const todo = tasks.filter((t) => t.status === "todo").length;
-  const overdue = tasks.filter((t) => isOverdue(t.dueDate, t.status === "done")).length;
-  const rate = total ? Math.round((done / total) * 100) : 0;
-  const plannedHours = tasks
-    .filter((t) => t.status !== "done")
-    .reduce((sum, t) => sum + (t.estimate ?? 0), 0);
-
+  let doing = 0, done = 0, overdue = 0, plannedHours = 0;
+  for (const task of tasks) {
+    if (task.status === "done") done++;
+    else plannedHours += task.estimate ?? 0;
+    if (task.status === "doing") doing++;
+    if (isOverdue(task.dueDate, task.status === "done")) overdue++;
+  }
+  const todo = total - done - doing;
+  const fraction = (count: number) => total ? count / total : 0;
   return (
-    <section className="stats" aria-label="任务统计">
-      <article className="stat-card">
-        <div className="stat-icon indigo">
-          <ListTodo size={19} />
-        </div>
-        <div className="stat-body">
-          <span className="stat-label">任务总数</span>
-          <strong className="stat-value">{total}</strong>
-          <span className="stat-sub">待办 {todo} · 进行中 {doing}</span>
-        </div>
-      </article>
-
-      <article className="stat-card">
-        <div className="stat-icon sky">
-          <Zap size={19} />
-        </div>
-        <div className="stat-body">
-          <span className="stat-label">进行中</span>
-          <strong className="stat-value">{doing}</strong>
-          <span className="stat-sub">剩余预估 {plannedHours}h</span>
-        </div>
-      </article>
-
-      <article className="stat-card">
-        <div
-          className="stat-ring"
-          style={{ ["--rate" as string]: `${rate * 3.6}deg` }}
-          aria-hidden="true"
-        >
-          <span>{rate}%</span>
-        </div>
-        <div className="stat-body">
-          <span className="stat-label">完成率</span>
-          <strong className="stat-value">
-            {done}
-            <small> / {total}</small>
-          </strong>
-          <span className="stat-sub">
-            <CheckCircle2 size={12} /> 已完成任务
+    <section className="sf-metrics" aria-label="任务统计">
+      <article className="sf-metric">
+        <span className="sf-label"><Layers3 />任务总数</span>
+        <div className="sf-number-row"><strong>{total}</strong>
+          <span className="sf-distribution" aria-hidden="true" title={`待办 ${todo} · 进行中 ${doing} · 已完成 ${done}`}>
+            <i style={{ width: `${100 * fraction(doing)}%` }} /><i style={{ width: `${100 * fraction(done)}%` }} />
           </span>
         </div>
+        <span className="sf-caption">待办 {todo} · 进行中 {doing}</span>
       </article>
-
-      <article className={overdue > 0 ? "stat-card stat-alert" : "stat-card"}>
-        <div className={overdue > 0 ? "stat-icon rose" : "stat-icon slate"}>
-          <AlertTriangle size={19} />
+      <article className="sf-metric">
+        <span className="sf-label"><CircleDot />进行中</span>
+        <div className="sf-number-row sf-emphasis"><strong>{doing}</strong></div>
+        <span className="sf-caption">剩余预估 {plannedHours.toLocaleString()} h</span>
+      </article>
+      <article className="sf-metric">
+        <span className="sf-label"><PieChart />完成率</span>
+        <div className="sf-number-row"><strong>{Math.round(100 * fraction(done))}<small>%</small></strong>
+          <svg aria-hidden="true" className="sf-ring" viewBox="0 0 32 32" fill="none" strokeWidth="3.5">
+            <circle cx="16" cy="16" r="12" stroke="var(--sf-track)" />
+            <circle cx="16" cy="16" r="12" stroke="var(--sf-blue)" pathLength="100" strokeDasharray={`${100 * fraction(done)} 100`} transform="rotate(-90 16 16)" />
+          </svg>
         </div>
-        <div className="stat-body">
-          <span className="stat-label">逾期风险</span>
-          <strong className="stat-value">{overdue}</strong>
-          <span className="stat-sub">
-            {overdue > 0 ? "请尽快处理逾期任务" : "当前没有逾期任务"}
-          </span>
-        </div>
+        <span className="sf-caption">已完成 {done} / {total}</span>
+      </article>
+      <article className="sf-metric">
+        <span className="sf-label"><CircleAlert />逾期风险</span>
+        <div className="sf-number-row"><strong>{overdue}</strong></div>
+        <span className="sf-caption">{overdue ? "请尽快处理逾期任务" : "当前没有逾期任务"}</span>
       </article>
     </section>
   );

@@ -7,6 +7,7 @@ import {
   Loader2,
   X,
 } from "lucide-react";
+import { WorkspaceHeading } from "./WorkspaceHeading";
 import { Board } from "./Board";
 import { CalendarView } from "./CalendarView";
 import { FilterBar } from "./FilterBar";
@@ -295,6 +296,7 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
           </div>
         )}
 
+        <WorkspaceHeading view={view} />
         <StatsBar tasks={store.tasks} />
 
         <FilterBar

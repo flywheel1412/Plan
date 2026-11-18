@@ -4,7 +4,8 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useDroppable,
   useSensor,
   useSensors,
@@ -17,11 +18,13 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Plus } from "lucide-react";
+import { Circle, CircleCheck, CircleDot, Plus } from "lucide-react";
 import type { Status, Task } from "../types";
 import { COLUMNS } from "../types";
 import { cx } from "../utils/ui";
 import { SortableTaskCard, TaskCardView } from "./TaskCard";
+
+import "./board-polish.css";
 
 interface BoardProps {
   tasks: Task[];
@@ -41,14 +44,14 @@ interface ColumnProps {
   id: Status;
   title: string;
   hint: string;
-  accent: string;
   tasks: Task[];
   highlight: boolean;
   onEdit: (task: Task) => void;
   onAdd: (status: Status) => void;
 }
 
-function Column({ id, title, hint, accent, tasks, highlight, onEdit, onAdd }: ColumnProps) {
+function Column({ id, title, hint, tasks, highlight, onEdit, onAdd }: ColumnProps) {
+  const StatusIcon = { todo: Circle, doing: CircleDot, done: CircleCheck }[id];
   const { setNodeRef } = useDroppable({ id });
 
   return (
@@ -59,12 +62,12 @@ function Column({ id, title, hint, accent, tasks, highlight, onEdit, onAdd }: Co
       aria-label={title}
     >
       <header className="column-head">
-        <span className="column-dot" style={{ background: accent }} />
+        <StatusIcon className="lane-icon" size={16} strokeWidth={2.25} aria-hidden="true" />
         <div className="column-title-wrap">
           <h3 className="column-title">{title}</h3>
           <span className="column-hint">{hint}</span>
         </div>
-        <span className="column-count">{tasks.length}</span>
+        <span className="column-count" aria-label={`${tasks.length} 个任务`}>{tasks.length}</span>
       </header>
 
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
@@ -94,7 +97,8 @@ export function Board({ tasks, allTasks, onEdit, onAdd, moveTask, reorderTask }:
   const [overStatus, setOverStatus] = useState<Status | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, POINTER_SENSOR_OPTIONS),
+    useSensor(MouseSensor, POINTER_SENSOR_OPTIONS),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 6 } }),
     useSensor(KeyboardSensor, KEYBOARD_SENSOR_OPTIONS),
   );
 
@@ -177,14 +181,13 @@ export function Board({ tasks, allTasks, onEdit, onAdd, moveTask, reorderTask }:
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <div className="board">
+      <div className="board polished-board">
         {COLUMNS.map((col) => (
           <Column
             key={col.id}
             id={col.id}
             title={col.title}
             hint={col.hint}
-            accent={col.accent}
             tasks={columns.get(col.id) ?? []}
             highlight={overStatus === col.id}
             onEdit={onEdit}

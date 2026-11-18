@@ -72,11 +72,11 @@ export function Header({
     <header className="app-header">
       <div className="header-inner">
         <div className="brand">
-          <div className="brand-mark">P</div>
+          <div className="brand-mark" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 26 26" fill="currentColor"><path d="M3 5h18l-3 4H3zm0 7h14l-3 4H3zm0 7h9l-3 4H3z" /></svg></div>
           <div className="brand-text">
             <div className="brand-title">
               Plan
-              <span className="brand-badge">排期看板</span>
+              <span className="brand-badge">WORKSPACE</span>
             </div>
             <div className="brand-sub">
               {remote
@@ -95,6 +95,8 @@ export function Header({
               <button
                 key={key}
                 type="button"
+                aria-label={VIEW_LABEL[key]}
+                aria-pressed={view === key}
                 className={view === key ? "view-tab active" : "view-tab"}
                 onClick={() => onChangeView(key)}
               >
@@ -209,7 +211,7 @@ export function Header({
             )}
           </div>
 
-          <button type="button" className="btn btn-primary" onClick={onNewTask}>
+          <button type="button" className="btn btn-primary" aria-label="新建任务" onClick={onNewTask}>
             <Plus size={17} strokeWidth={2.4} />
             <span>新建任务</span>
           </button>
