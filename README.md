@@ -58,6 +58,13 @@ npm run preview    # 预览生产构建
 - 也可在仓库 **Actions → Deploy to GitHub Pages** 中手动触发（`workflow_dispatch`）。
 - 若使用自有域名，可在 **Settings → Pages → Custom domain** 中配置。
 
+### 内网 Gitea 镜像
+
+- 源码镜像：http://10.22.16.201:8032/jingxu/plan-kanban
+- 说明：Gitea 1.27.3 不提供内置静态 Pages，且 raw 文件被强制以 `text/plain` + CSP sandbox 返回，无法直接承载 HTML/JS；因此网页托管以 GitHub Pages 为准，Gitea 仅保存源码镜像。
+- 更新镜像：在能同时访问 GitHub 与 Gitea 的机器上执行
+  `git clone --mirror https://github.com/flywheel1412/Plan.git && git push --mirror ssh://git@10.22.16.201:3333/jingxu/plan-kanban.git`
+
 ## 数据与备份
 
 - 数据保存在浏览器 `localStorage` 的 `plan-kanban.tasks.v1` 键中，刷新不丢失。
