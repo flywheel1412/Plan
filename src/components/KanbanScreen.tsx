@@ -411,7 +411,7 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
         {view === "board" && hasScheduled && (
           <p className="board-footnote">
             <Keyboard size={14} />
-            小提示：按 <kbd>N</kbd> 快速新建任务，拖动卡片可跨列调整状态。
+            小提示：按 <kbd>N</kbd> 快速新建任务，拖动卡片可跨列调整状态；拖动栏目标题右侧的把手可调整栏目顺序。
           </p>
         )}
 
