@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import {
   closestCorners,
+  pointerWithin,
   DndContext,
+  type CollisionDetection,
   DragOverlay,
   KeyboardSensor,
   MouseSensor,
@@ -18,7 +20,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Circle, CircleCheck, CircleDot, Plus } from "lucide-react";
+import { Circle, CircleCheck, CircleDot, CirclePause, Plus } from "lucide-react";
 import type { Status, Task } from "../types";
 import { COLUMNS } from "../types";
 import { cx } from "../utils/ui";
@@ -37,6 +39,14 @@ interface BoardProps {
 
 const COLUMN_IDS = new Set<string>(COLUMNS.map((c) => c.id));
 
+// Prefer the column or task under the pointer; retain keyboard collision support.
+const boardCollisionDetection: CollisionDetection = (args) => {
+  const pointerHits = pointerWithin(args);
+  if (!pointerHits.length) return closestCorners(args);
+  const taskHit = pointerHits.find((hit) => !COLUMN_IDS.has(String(hit.id)));
+  return taskHit ? [taskHit] : pointerHits;
+};
+
 const POINTER_SENSOR_OPTIONS = { activationConstraint: { distance: 6 } };
 const KEYBOARD_SENSOR_OPTIONS = { coordinateGetter: sortableKeyboardCoordinates };
 
@@ -51,7 +61,7 @@ interface ColumnProps {
 }
 
 function Column({ id, title, hint, tasks, highlight, onEdit, onAdd }: ColumnProps) {
-  const StatusIcon = { todo: Circle, doing: CircleDot, done: CircleCheck }[id];
+  const StatusIcon = { todo: Circle, doing: CircleDot, postponed: CirclePause, done: CircleCheck }[id];
   const { setNodeRef } = useDroppable({ id });
 
   return (
@@ -175,7 +185,7 @@ export function Board({ tasks, allTasks, onEdit, onAdd, moveTask, reorderTask }:
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCorners}
+      collisionDetection={boardCollisionDetection}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}

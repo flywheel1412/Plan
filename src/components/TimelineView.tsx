@@ -26,6 +26,7 @@ interface TimelineViewProps {
 const STATUS_COLOR: Record<Task["status"], string> = {
   todo: "#94a3b8",
   doing: "#6366f1",
+  postponed: "#b7791f",
   done: "#10b981",
 };
 

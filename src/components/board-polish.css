@@ -23,6 +23,8 @@
   background: var(--board-lane); backdrop-filter: none;
 }
 .polished-board [data-status="doing"] { --lane-color: var(--board-blue); }
+.polished-board [data-status="postponed"] { --lane-color: #9b6000; }
+[data-theme="dark"] .polished-board [data-status="postponed"] { --lane-color: #efbc65; }
 .polished-board [data-status="done"] { --lane-color: #247560; }
 [data-theme="dark"] .polished-board [data-status="done"] { --lane-color: #81c9b2; }
 .polished-board .board-column.is-over {

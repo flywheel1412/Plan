@@ -9,6 +9,7 @@ export const TAG_PREFIX = "tag::";
 export const STATUS_LABELS: Record<Status, string> = {
   todo: "status::todo",
   doing: "status::doing",
+  postponed: "status::postponed",
   done: "status::done",
 };
 
@@ -22,6 +23,7 @@ export const PRIORITY_LABELS: Record<Priority, string> = {
 export const BASE_LABELS: Array<{ name: string; color: string }> = [
   { name: STATUS_LABELS.todo, color: "#64748b" },
   { name: STATUS_LABELS.doing, color: "#6366f1" },
+  { name: STATUS_LABELS.postponed, color: "#b7791f" },
   { name: STATUS_LABELS.done, color: "#10b981" },
   { name: PRIORITY_LABELS.P0, color: "#e11d48" },
   { name: PRIORITY_LABELS.P1, color: "#d97706" },
@@ -108,6 +110,7 @@ export function buildDescription(description: string, meta: TaskMeta): string {
 }
 
 function statusFromLabels(labels: string[]): Status | null {
+  if (labels.includes(STATUS_LABELS.postponed)) return "postponed";
   if (labels.includes(STATUS_LABELS.doing)) return "doing";
   if (labels.includes(STATUS_LABELS.done)) return "done";
   if (labels.includes(STATUS_LABELS.todo)) return "todo";

@@ -1,4 +1,4 @@
-export type Status = "todo" | "doing" | "done";
+export type Status = "todo" | "doing" | "postponed" | "done";
 export type Priority = "P0" | "P1" | "P2" | "P3";
 
 export interface Task {
@@ -30,6 +30,7 @@ export interface ColumnMeta {
 export const COLUMNS: ColumnMeta[] = [
   { id: "todo", title: "待办", hint: "已收集，等待排期", accent: "#64748b" },
   { id: "doing", title: "进行中", hint: "本周重点推进", accent: "#6366f1" },
+  { id: "postponed", title: "推迟", hint: "暂缓，待重新安排", accent: "#b7791f" },
   { id: "done", title: "已完成", hint: "已交付并验收", accent: "#10b981" },
 ];
 
@@ -48,6 +49,7 @@ export const PRIORITY_ORDER: Priority[] = ["P0", "P1", "P2", "P3"];
 export const STATUS_LABEL: Record<Status, string> = {
   todo: "待办",
   doing: "进行中",
+  postponed: "推迟",
   done: "已完成",
 };
 

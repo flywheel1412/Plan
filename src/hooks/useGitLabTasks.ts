@@ -61,7 +61,7 @@ function errorText(error: unknown): string {
 }
 
 function sortTasks(tasks: Task[]): Task[] {
-  const statusRank: Record<Status, number> = { todo: 0, doing: 1, done: 2 };
+  const statusRank: Record<Status, number> = { todo: 0, doing: 1, postponed: 2, done: 3 };
   return [...tasks].sort((a, b) => {
     if (a.status !== b.status) return statusRank[a.status] - statusRank[b.status];
     if (a.order !== b.order) return a.order - b.order;
@@ -439,7 +439,7 @@ export function useGitLabTasks(config: GitLabConfig): GitLabStore {
           (item) =>
             item &&
             typeof item.title === "string" &&
-            ["todo", "doing", "done"].includes(item.status),
+            ["todo", "doing", "postponed", "done"].includes(item.status),
         )
         .map((item, index) => ({
           id: `import-${index}`,

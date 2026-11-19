@@ -205,7 +205,7 @@ export function KanbanScreen({ store, remote }: KanbanScreenProps) {
           (item) =>
             item &&
             typeof item.title === "string" &&
-            ["todo", "doing", "done"].includes(item.status),
+            ["todo", "doing", "postponed", "done"].includes(item.status),
         )
         .map((item, index) => ({
           id: typeof item.id === "string" ? item.id : `import-${Date.now()}-${index}`,

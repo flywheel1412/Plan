@@ -11,7 +11,7 @@ const rid = () =>
 
 const normalizeOrder = (tasks: Task[]): Task[] => {
   const grouped = new Map<Status, Task[]>();
-  (["todo", "doing", "done"] as Status[]).forEach((s) => grouped.set(s, []));
+  (["todo", "doing", "postponed", "done"] as Status[]).forEach((s) => grouped.set(s, []));
   tasks.forEach((t) => grouped.get(t.status)?.push(t));
   const next: Task[] = [];
   grouped.forEach((list) => {
